@@ -11,12 +11,14 @@ import com.jme3.system.AppSettings;
 import java.awt.*;
 
 public class Main extends SimpleApplication {
-    public static void main(String[] args) {
+    public static Main app;
+    public static AppSettings settings;
 
-        Main app = new Main();
+    public static void main(String[] args) {
+        app = new Main();
         app.setShowSettings(false);
 
-        AppSettings settings = new AppSettings(true);
+        settings = new AppSettings(true);
         settings.setTitle("3D Playground");
         settings.setVSync(true);
 
@@ -35,10 +37,57 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         getFlyByCamera().setMoveSpeed(10f);
 
+        // Template
         getInputManager().addMapping("Test", new KeyTrigger(KeyInput.KEY_SPACE));
         getInputManager().addListener((ActionListener) (name, isPressed, tpf) -> {
-            System.out.println(tpf);
+            if (!isPressed)
+                return;
+
+            System.out.println("Here1");
         }, "Test");
+
+        getInputManager().addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11));
+        getInputManager().addListener((ActionListener) (name, isPressed, tpf) -> {
+            if (!isPressed)
+                return;
+
+            settings.setFullscreen(!settings.isFullscreen());
+
+            GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            DisplayMode[] modes = device.getDisplayModes();
+
+            int s = 0;
+            for (DisplayMode mode : modes) {
+                System.out.println(s + ": " + mode.getWidth() + ", " + mode.getHeight());
+                s++;
+            }
+
+            DisplayMode bestRes = modes[0];
+            if (!settings.isFullscreen()) {
+                DisplayMode nextRes = null;
+                for (int i = 1; i < modes.length; i++) {
+                    if (bestRes.getWidth() != modes[i].getWidth() &&
+                        bestRes.getHeight() != modes[i].getWidth()) {
+                        if (nextRes != null) {
+                            if (modes[i].getWidth() > nextRes.getWidth() &&
+                                modes[i].getHeight() > nextRes.getHeight()) {
+                                nextRes = modes[i];
+                            }
+                        } else {
+                            nextRes = modes[i];
+                        }
+                    }
+                }
+
+                if (nextRes != null)
+                    bestRes = nextRes;
+            }
+            System.out.println("Selected next res: " + bestRes.getWidth() + ", " + bestRes.getHeight());
+            settings.setResolution(bestRes.getWidth(), bestRes.getHeight());
+
+            app.setSettings(settings);
+            app.restart();
+        }, "Fullscreen");
 
 
         Box b = new Box(1, 1, 1);
