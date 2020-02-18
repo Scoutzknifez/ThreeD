@@ -7,6 +7,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
+import utility.Utils;
 
 import java.awt.*;
 
@@ -22,11 +23,8 @@ public class Main extends SimpleApplication {
         settings.setTitle("3D Playground");
         settings.setVSync(true);
 
-        // Dimension 16:9 res... (100 / 16) * 9 = 56
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        settings.setResolution(dimension.width - 100, dimension.height - 56);
-        //settings.setResolution(dimension.width, dimension.height);
-        //settings.setFullscreen(true);
+        DisplayMode res = Utils.getNextSmallestScreen(settings);
+        settings.setResolution(res.getWidth(), res.getHeight());
 
         app.setSettings(settings);
 
@@ -52,36 +50,8 @@ public class Main extends SimpleApplication {
                 return;
 
             settings.setFullscreen(!settings.isFullscreen());
+            DisplayMode bestRes = Utils.getNextSmallestScreen(settings);
 
-            GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-            DisplayMode[] modes = device.getDisplayModes();
-
-            int s = 0;
-            for (DisplayMode mode : modes) {
-                System.out.println(s + ": " + mode.getWidth() + ", " + mode.getHeight());
-                s++;
-            }
-
-            DisplayMode bestRes = modes[0];
-            if (!settings.isFullscreen()) {
-                DisplayMode nextRes = null;
-                for (int i = 1; i < modes.length; i++) {
-                    if (bestRes.getWidth() != modes[i].getWidth() &&
-                        bestRes.getHeight() != modes[i].getWidth()) {
-                        if (nextRes != null) {
-                            if (modes[i].getWidth() > nextRes.getWidth() &&
-                                modes[i].getHeight() > nextRes.getHeight()) {
-                                nextRes = modes[i];
-                            }
-                        } else {
-                            nextRes = modes[i];
-                        }
-                    }
-                }
-
-                if (nextRes != null)
-                    bestRes = nextRes;
-            }
             System.out.println("Selected next res: " + bestRes.getWidth() + ", " + bestRes.getHeight());
             settings.setResolution(bestRes.getWidth(), bestRes.getHeight());
 
