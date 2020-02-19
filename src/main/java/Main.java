@@ -33,32 +33,9 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        initBoundKeys();
+
         getFlyByCamera().setMoveSpeed(10f);
-
-        // Template
-        getInputManager().addMapping("Test", new KeyTrigger(KeyInput.KEY_SPACE));
-        getInputManager().addListener((ActionListener) (name, isPressed, tpf) -> {
-            if (!isPressed)
-                return;
-
-            System.out.println("Here1");
-        }, "Test");
-
-        getInputManager().addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11));
-        getInputManager().addListener((ActionListener) (name, isPressed, tpf) -> {
-            if (!isPressed)
-                return;
-
-            settings.setFullscreen(!settings.isFullscreen());
-            DisplayMode bestRes = Utils.getNextSmallestScreen(settings);
-
-            System.out.println("Selected next res: " + bestRes.getWidth() + ", " + bestRes.getHeight());
-            settings.setResolution(bestRes.getWidth(), bestRes.getHeight());
-
-            app.setSettings(settings);
-            app.restart();
-        }, "Fullscreen");
-
 
         Box b = new Box(1, 1, 1);
         Geometry geom = new Geometry("Box", b);
@@ -74,5 +51,22 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
+    }
+
+    public void initBoundKeys() {
+        getInputManager().addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11));
+        getInputManager().addListener((ActionListener) (name, isPressed, tpf) -> {
+            if (!isPressed)
+                return;
+
+            settings.setFullscreen(!settings.isFullscreen());
+            DisplayMode bestRes = Utils.getNextSmallestScreen(settings);
+
+            System.out.println("Selected next res: " + bestRes.getWidth() + ", " + bestRes.getHeight());
+            settings.setResolution(bestRes.getWidth(), bestRes.getHeight());
+
+            app.setSettings(settings);
+            app.restart();
+        }, "Fullscreen");
     }
 }
